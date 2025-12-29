@@ -41,6 +41,8 @@ int main(void) {
   printf("list->head %p\n", (void *)list->head);
   printf("list->tail %p\n", (void *)list->tail);
   printf("list->size %zu\n", list->size);
+  
+  free(list);
 
   return 0;
 }
