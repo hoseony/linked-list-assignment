@@ -68,8 +68,8 @@ void list_free(list_t *list) {
   free(list);
 }
 
+/** test code fzor list_free with dummy data
 
-//test code for list_free with dummy data
 int main(void) {
   list_t *list = list_alloc();
 
@@ -94,4 +94,83 @@ int main(void) {
   printf("pointer %p\n", (void *)list->size);
 
   list_free(list);
-} //tested with leaks --atExist -- ./singleLinked
+} //tested with leaks --atExist -- ./singleLinked, 0 leaks
+
+**/
+
+int list_prepend(list_t *list, int val) {
+
+  if (list == NULL) {
+    return 1;
+  }
+
+  node_t *newNode = malloc(sizeof(node_t));
+  if (newNode == NULL) { //check for allocation failure
+    return 1;
+  } 
+  
+  newNode->data = val;          //insert data
+  newNode->next = list->head;   //newNode points to the head of the original pointer (putting newNode before)
+  list->head = newNode;         //point head to new node
+
+  if(list->size == 0) { //check case of size 0
+    list->tail = newNode;
+  }
+
+  list->size++;
+  return 0;
+}
+
+
+//made for debugging purpose
+void list_print(list_t *list) {
+  if (list == NULL) {
+    printf("NULL list");
+    return;
+  }
+
+  printf("list: head=%p, tail=%p, size =%zu \n", (void *)list->head, (void *)list->tail, list->size);
+
+  printf("head ->");
+  node_t *ptr = list->head;
+
+  while (ptr != NULL) {
+    printf("(%p)[%d]", (void *)ptr, ptr->data);
+    ptr = ptr->next;
+  }
+}
+
+
+/**
+
+//testing code for list_prepend
+int main(void) {
+  list_t *list = list_alloc();
+
+  printf("pointer %p\n", (void *)list->head);
+  printf("pointer %p\n", (void *)list->tail);
+  printf("pointer %p\n", (void *)list->size);
+
+  list_prepend(list, 10);
+
+  printf("pointer %p\n", (void *)list->head);
+  printf("pointer %p\n", (void *)list->tail);
+  printf("pointer %p\n", (void *)list->size);
+  printf("data %d\n", list->head->data);
+  printf("next %p\n", (void *)list->head->next);
+
+  list_free(list);
+}
+
+**/
+
+int main(void) {
+  list_t *list = list_alloc();
+
+  list_prepend(list, 1);
+  list_prepend(list, 2);
+  list_prepend(list, 3);
+
+  list_print(list);
+  list_free(list);
+}
