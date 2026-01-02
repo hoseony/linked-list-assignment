@@ -121,6 +121,34 @@ int list_prepend(list_t *list, int val) {
   return 0;
 }
 
+int list_append(list_t *list, int val) {
+
+  if (list == NULL) {
+    return 1;
+  }
+
+  node_t *newNode = malloc(sizeof(node_t));
+  if (newNode == NULL) {
+    return 1;
+  }
+
+  newNode->data = val;
+  newNode->next = NULL;
+  
+  if(list->size == 0) {
+    list->head = newNode;
+    list->tail = newNode;
+  } else {
+    list->tail->next = newNode;
+    list->tail = newNode;
+  }
+
+  list->size++;
+  return 0;
+}
+
+
+
 
 //made for debugging purpose
 void list_print(list_t *list) {
@@ -138,6 +166,8 @@ void list_print(list_t *list) {
     printf("(%p)[%d]", (void *)ptr, ptr->data);
     ptr = ptr->next;
   }
+
+  printf("\n tail check, tail: (%p)[%d], tail->next=(%p\n)", (void *)list->tail, list->tail->data, (void *)list->tail->next); //to check tail node
 }
 
 
@@ -170,6 +200,7 @@ int main(void) {
   list_prepend(list, 1);
   list_prepend(list, 2);
   list_prepend(list, 3);
+  list_append(list, 4);
 
   list_print(list);
   list_free(list);
