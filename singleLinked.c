@@ -47,6 +47,26 @@ void list_free(list_t *list) {
   free(list);
 }
 
+//made for debugging purpose
+void list_print(list_t *list) {
+  if (list == NULL) {
+    printf("NULL list");
+    return;
+  }
+
+  printf("list: head=%p, tail=%p, size =%zu \n", (void *)list->head, (void *)list->tail, list->size);
+
+  printf("head ->");
+  node_t *ptr = list->head;
+
+  while (ptr != NULL) {
+    printf("(%p)[%d]", (void *)ptr, ptr->data);
+    ptr = ptr->next;
+  }
+
+  printf("\n tail check, tail: (%p)[%d], tail->next=(%p\n)", (void *)list->tail, list->tail->data, (void *)list->tail->next); //to check tail node
+}
+
 
 int list_prepend(list_t *list, int val) {
 
@@ -98,26 +118,6 @@ int list_append(list_t *list, int val) {
   return 0;
 }
 
-//made for debugging purpose
-void list_print(list_t *list) {
-  if (list == NULL) {
-    printf("NULL list");
-    return;
-  }
-
-  printf("list: head=%p, tail=%p, size =%zu \n", (void *)list->head, (void *)list->tail, list->size);
-
-  printf("head ->");
-  node_t *ptr = list->head;
-
-  while (ptr != NULL) {
-    printf("(%p)[%d]", (void *)ptr, ptr->data);
-    ptr = ptr->next;
-  }
-
-  printf("\n tail check, tail: (%p)[%d], tail->next=(%p\n)", (void *)list->tail, list->tail->data, (void *)list->tail->next); //to check tail node
-}
-
 
 int list_insert(list_t *list, int val, size_t pos) {
   if (list == NULL) {
@@ -154,7 +154,66 @@ int list_insert(list_t *list, int val, size_t pos) {
 
 }
 
+int list_rm(list_t *list, int *val, size_t pos) {
+  if (list == NULL) {
+    return 1;
+  }
 
+  if (pos > list->size) {
+    return 1;
+  }
+
+  node_t *targetNode;
+  node_t *prev;
+  prev = list->head;
+
+  if (pos == 0) {
+    targetNode = list->head;
+    list->head = targetNode->next; //targetNode->next should be NULL tho
+
+    if (list->size == 1) {
+      list->tail = NULL; 
+    }
+  } else {
+
+    for (size_t i = 0; i < pos - 1; i++) {
+      prev = prev->next;
+    }
+
+    targetNode = prev->next;
+    prev->next = targetNode->next;
+
+    if (pos == list->size-1) { //since starts from 0
+      list->tail = prev;
+    }
+  }
+  
+  if (val != NULL) {
+    *val = targetNode->data;
+  }
+
+  free(targetNode);
+  list->size--;
+  return 0;
+}
+  /** logic:
+  if *val != NULL, val = targetNode->data
+
+  if head (pos == 0)
+   - targetNode = list->head
+   - list->head = targetNode->next
+
+  find previous node (call it prev)
+   - targetNode = prev->next
+   - prev->next = targetNode->next
+
+  if targetNode is tail
+   - list->tail = prev
+
+  what if size 1? (only when pos == 0)
+   - make tail to be NULL
+   - 
+  **/
 
 
 int main(void) {
@@ -166,8 +225,12 @@ int main(void) {
   list_append(list, 0);
 
   list_print(list);
-  list_insert(list, 30, 3);
 
+  list_insert(list, 30, 3);
   list_print(list);
+
+  list_rm(list, NULL, 3);
+  list_print(list);
+
   list_free(list);
 }
