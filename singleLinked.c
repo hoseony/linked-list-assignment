@@ -196,24 +196,6 @@ int list_rm(list_t *list, int *val, size_t pos) {
   list->size--;
   return 0;
 }
-  /** logic:
-  if *val != NULL, val = targetNode->data
-
-  if head (pos == 0)
-   - targetNode = list->head
-   - list->head = targetNode->next
-
-  find previous node (call it prev)
-   - targetNode = prev->next
-   - prev->next = targetNode->next
-
-  if targetNode is tail
-   - list->tail = prev
-
-  what if size 1? (only when pos == 0)
-   - make tail to be NULL
-   - 
-  **/
 
 
 int main(void) {
