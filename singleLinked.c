@@ -14,7 +14,6 @@ typedef struct list_s {
 } list_t;
 
 
-
 list_t *list_alloc(void) {
 	list_t *list;
   list = NULL;
@@ -27,7 +26,6 @@ list_t *list_alloc(void) {
 
   return list;
 }
-
 
 void list_free(list_t *list) {
 
@@ -63,10 +61,10 @@ void list_print(list_t *list) {
     printf("(%p)[%d]", (void *)ptr, ptr->data);
     ptr = ptr->next;
   }
-
-  printf("\n tail check, tail: (%p)[%d], tail->next=(%p\n)", (void *)list->tail, list->tail->data, (void *)list->tail->next); //to check tail node
+  
+  printf("\n");
+  // printf("\n tail check, tail: (%p)[%d], tail->next=(%p\n)", (void *)list->tail, list->tail->data, (void *)list->tail->next); //to check tail node
 }
-
 
 int list_prepend(list_t *list, int val) {
 
@@ -90,7 +88,6 @@ int list_prepend(list_t *list, int val) {
   list->size++;
   return 0;
 }
-
 
 int list_append(list_t *list, int val) {
 
@@ -118,7 +115,6 @@ int list_append(list_t *list, int val) {
   return 0;
 }
 
-
 int list_insert(list_t *list, int val, size_t pos) {
   if (list == NULL) {
     return 1;
@@ -144,7 +140,6 @@ int list_insert(list_t *list, int val, size_t pos) {
     }
 
     newNode->data = val;
-
     newNode->next = prev->next;
     prev->next = newNode;
 
@@ -197,6 +192,42 @@ int list_rm(list_t *list, int *val, size_t pos) {
   return 0;
 }
 
+int list_set(list_t *list, int val, size_t pos) {
+  if (list == NULL) {
+    return 1;
+  }
+
+  if (pos >= list->size) {
+    return 1;
+  }
+
+  node_t *prev;
+  prev = list->head;
+
+  for (size_t i = 0; i < pos; i++) { //this is not i <pos-1 to keep the behavior consistant with other functions.
+    prev = prev->next;
+  }
+
+  prev->data = val;
+  return 0;
+}
+
+int list_get(list_t *list, int *val, size_t pos) {
+  if (list == NULL || pos >= list->size) {
+    return 1;
+  }
+
+  node_t *prev;
+  prev = list->head;
+
+  for (size_t i = 0; i< pos; i++) {
+    prev = prev->next;
+  }
+
+  *val = prev->data;
+  return 0;
+}
+
 
 int main(void) {
   list_t *list = list_alloc();
@@ -205,13 +236,22 @@ int main(void) {
   list_prepend(list, 2);
   list_prepend(list, 3);
   list_append(list, 0);
+  list_print(list);
+  
+  int x;
+  if (list_get(list, &x, 3) == 0) {
+    printf("\n oh look at this %d\n", x);
+  } else {
+    printf("oh no \n");
+  }
 
+  list_insert(list, 30, 4);
   list_print(list);
 
-  list_insert(list, 30, 3);
+  list_set(list, 100, 4);
   list_print(list);
 
-  list_rm(list, NULL, 3);
+  list_rm(list, NULL, 4);
   list_print(list);
 
   list_free(list);
