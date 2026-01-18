@@ -229,6 +229,8 @@ int list_get(list_t *list, int *val, size_t pos) {
 }
 
 
+
+//this is just for testing
 int main(void) {
   list_t *list = list_alloc();
 
