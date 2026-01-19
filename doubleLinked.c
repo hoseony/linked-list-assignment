@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stddef.h>
 
+//leaks --atExit -- ./doubleLinked 
+
 typedef struct node_s {
   void *data;
   struct node_s *prev;
@@ -51,7 +53,7 @@ void list_print(list_t *list) {
     } else {
       int *p = (int *)(cur->data);
       printf("data: ");
-      for (int i = 0; i < 9; i++) { //*not sure how to make it adopt the data size,
+      for (int i = 0; i < 9; i++) { //only works for this case
         printf("%d ", p[i]); //pointer arithmetic (for my note)
       }
     }
@@ -74,17 +76,22 @@ node_t *matrix_3x3(int start) {
     return node;
 }
 
-void list_free(list_t *list, void (*free_data)(void *data)) {
+void list_free(list_t *list, void (*free_data)(void*)) {
     if (list == NULL) {
-        return NULL;
+        return;
     }
 
-    list_t->head->data
-    free data
+    node_t *cur = list->head;
 
-    list_t -> head -> next
-    free head->prev
-
+    while (cur->next != NULL) {
+        cur = cur->next;
+        (*free_data)(cur->prev->data);
+        free(cur->prev);
+    }
+    
+    (*free_data)(cur->data);
+    free(cur);
+    free(list);
 }
 
 int list_prepend(list_t *list, void *val) {
@@ -142,11 +149,67 @@ int list_append(list_t *list, void *val) {
 
 }
 
-int main() {
+int list_insert(list_t *list, void *val, size_t pos) {
+    if (list == NULL) {
+        return 1;
+    }
 
+    node_t *newNode = malloc(sizeof(node_t));
+    if (newNode == NULL) {
+        return 1;
+    }
+    
+    if (pos == 0) {
+        list_append(list, val);
+    }
+
+    if (pos == list->size) {
+        list_append(list, val);
+    }
+
+    newNode->data = val;
+    node_t *cur;
+
+    if (pos < ((list->size)/2)) { //use nexta
+        cur = list->head;
+        for(size_t i = 0; i < pos; i ++) {
+            cur = cur->next;
+        }
+    } else { //prev
+        cur = list->tail;
+        for(size_t i = 0; i < (list->size)-pos; i++) {
+            cur = cur->prev;
+        }
+    }
+
+    newNode->next = cur;
+    newNode->prev = cur->prev;
+
+    cur->prev->next = newNode;
+    cur->prev = newNode;
+
+    list->size++;
+    return 0;
+}
+
+int list_rm(list_t *list, void **val, size_t pos) {
+    if (list == NULL) {
+        return 1;
+    }
+
+
+}
+
+
+
+//test code
+int main() {
     list_t *list = list_alloc();
     node_t *node0 = matrix_3x3(1);
     node_t *node1 = matrix_3x3(2);
+    node_t *node2 = matrix_3x3(3);
+    node_t *node3 = matrix_3x3(4);
+    node_t *node4 = matrix_3x3(5);
 
     for(size_t i=0; i<9; i++) {
         printf("%d. ", i[(int *)(node0->data)]);
@@ -154,11 +217,18 @@ int main() {
 
     list_prepend(list, node0->data);
     list_append(list, node1->data);
+    list_append(list, node2->data);
+    list_append(list, node3->data);
+
+    list_insert(list, node4->data, 1);
 
     list_print(list);
 
-    free(node0->data);
-    free(node0);
-    free(node1->data);
+    list_free(list, (void (*)(void*))free);
+
+    free(node0); //i don't feel like this is a good way of doing thing because now I need to free this nodes again...
     free(node1);
+    free(node2);
+    free(node3);
+    free(node4);
 }
