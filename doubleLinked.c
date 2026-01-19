@@ -154,6 +154,10 @@ int list_insert(list_t *list, void *val, size_t pos) {
         return 1;
     }
 
+    if (pos >= (list->size)) {
+        return 1;
+    }
+
     node_t *newNode = malloc(sizeof(node_t));
     if (newNode == NULL) {
         return 1;
@@ -177,7 +181,7 @@ int list_insert(list_t *list, void *val, size_t pos) {
         }
     } else { //prev
         cur = list->tail;
-        for(size_t i = 0; i < (list->size)-pos; i++) {
+        for(size_t i = 0; i < (list->size)-pos-1; i++) {
             cur = cur->prev;
         }
     }
@@ -192,12 +196,53 @@ int list_insert(list_t *list, void *val, size_t pos) {
     return 0;
 }
 
-int list_rm(list_t *list, void **val, size_t pos) {
+
+int list_rm(list_t *list, void **val, size_t pos) { 
+    //by my understanding **val is needed because everything is passed by value(or the copy of the pointer).
+    //That is why you need to pass a pointer to a pointer (or void **val).
+    //very weird and interesting.
+
     if (list == NULL) {
         return 1;
     }
 
+    if (pos >= (list->size)) {
+        return 1;
+    }
 
+    node_t *cur;
+
+    if (pos < ((list->size)/2)) { //use nexta
+        cur = list->head;
+        for(size_t i = 0; i < pos; i ++) {
+            cur = cur->next;
+        }
+    } else { //prev
+        cur = list->tail;
+        for(size_t i = 0; i < (list->size)-pos-1; i++) {
+            cur = cur->prev;
+        }
+    }
+
+    *val = cur->data;
+
+    if (cur->prev == NULL) {
+        list->head = cur->next;
+    } else {
+        cur->prev->next = cur->next;
+    }
+
+    if (cur->next == NULL) {
+        list->head = cur->prev;
+    } else {
+        cur->next->prev = cur->prev;
+    }
+
+    //free(val->data); // why this frees something that is not allocated? 
+    free(cur);
+
+    list->size--;
+    return 0; 
 }
 
 
@@ -220,7 +265,20 @@ int main() {
     list_append(list, node2->data);
     list_append(list, node3->data);
 
-    list_insert(list, node4->data, 1);
+    list_insert(list, node4->data, 3);
+
+    list_print(list);
+
+    void *removed;
+
+    list_rm(list, &(removed), 1);
+
+    int *p = (int *)removed;
+    printf("\n removed: ");
+    for (int i = 0; i < 9; i++) {
+        printf("%d, ", p[i]);
+    }
+    printf("\n");
 
     list_print(list);
 
@@ -231,4 +289,5 @@ int main() {
     free(node2);
     free(node3);
     free(node4);
+    free(removed);
 }
