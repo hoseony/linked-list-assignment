@@ -200,7 +200,7 @@ int list_insert(list_t *list, void *val, size_t pos) {
 int list_rm(list_t *list, void **val, size_t pos) { 
     //by my understanding **val is needed because everything is passed by value(or the copy of the pointer).
     //That is why you need to pass a pointer to a pointer (or void **val).
-    //very weird and interesting.
+    //at least that is my conclusion for now
 
     if (list == NULL) {
         return 1;
@@ -245,6 +245,60 @@ int list_rm(list_t *list, void **val, size_t pos) {
     return 0; 
 }
 
+int list_set(list_t *list, void *val, size_t pos) {
+    if (list == NULL) {
+        return 1;
+    }
+
+    if (pos >= (list->size)) {
+        return 1;
+    }
+
+    node_t *cur;
+
+    if (pos < ((list->size)/2)) { //use nexta
+        cur = list->head;
+        for(size_t i = 0; i < pos; i ++) {
+            cur = cur->next;
+        }
+    } else { //prev
+        cur = list->tail;
+        for(size_t i = 0; i < (list->size)-pos-1; i++) {
+            cur = cur->prev;
+        }
+    }
+
+    cur->data = val;
+    return 0; 
+}
+
+int list_get(list_t *list, void **val, size_t pos){
+    if (list == NULL) {
+        return 1;
+    }
+
+    if (pos >= (list->size)) {
+        return 1;
+    }
+
+    node_t *cur;
+
+    if (pos < ((list->size)/2)) { //use nexta
+        cur = list->head;
+        for(size_t i = 0; i < pos; i ++) {
+            cur = cur->next;
+        }
+    } else { //prev
+        cur = list->tail;
+        for(size_t i = 0; i < (list->size)-pos-1; i++) {
+            cur = cur->prev;
+        }
+    }
+
+    *val = cur->data;
+    return 0;
+}
+
 
 
 //test code
@@ -270,9 +324,7 @@ int main() {
     list_print(list);
 
     void *removed;
-
     list_rm(list, &(removed), 1);
-
     int *p = (int *)removed;
     printf("\n removed: ");
     for (int i = 0; i < 9; i++) {
@@ -281,13 +333,35 @@ int main() {
     printf("\n");
 
     list_print(list);
+    
+    void *get;
+    list_get(list, &(get), 1);
+    int *q = (int *)get;
+    printf("\n got: ");
+    for (int i = 0; i < 9; i++) {
+       printf("%d, ", q[i]);
+    }
+    printf("\n");
+
+    list_print(list);
+
+
+    node_t *node5 = matrix_3x3(100);
+
+    list_set(list, node5->data, 1);
+
+    list_print(list);
 
     list_free(list, (void (*)(void*))free);
+
+
 
     free(node0); //i don't feel like this is a good way of doing thing because now I need to free this nodes again...
     free(node1);
     free(node2);
     free(node3);
     free(node4);
+    free(node5);
     free(removed);
+    free(get);
 }
