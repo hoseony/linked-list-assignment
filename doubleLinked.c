@@ -345,7 +345,6 @@ int main() {
 
     list_print(list);
 
-
     node_t *node5 = matrix_3x3(100);
 
     list_set(list, node5->data, 1);
@@ -353,8 +352,6 @@ int main() {
     list_print(list);
 
     list_free(list, (void (*)(void*))free);
-
-
 
     free(node0); //i don't feel like this is a good way of doing thing because now I need to free this nodes again...
     free(node1);
