@@ -1,18 +1,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-typedef struct node_s {
-	int data;
-	struct node_s *next;
-} node_t;
-
-typedef struct list_s {
-	node_t *head;
-	node_t *tail;
-	size_t size;
-} list_t;
-
+#include "singleLinked.h"
 
 list_t *list_alloc(void) {
 	list_t *list;
@@ -229,7 +218,7 @@ int list_get(list_t *list, int *val, size_t pos) {
 }
 
 
-
+/*
 //this is just for testing
 int main(void) {
   list_t *list = list_alloc();
@@ -258,3 +247,4 @@ int main(void) {
 
   list_free(list);
 }
+*/
